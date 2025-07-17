@@ -18,6 +18,6 @@
     "require": {
         "php": ">=8.2",
         "ext-fileinfo": "*",
-        "nimblephp/framework": "^0.2.2"
+        "nimblephp/framework": ">=0.2.2"
     }
 }
