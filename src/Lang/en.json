@@ -1,0 +1,18 @@
+{
+  "module": {
+    "email": {
+      "failed_send": "Failed to send email",
+      "failed_smtp_connect": "Could not connect to SMTP server",
+      "failed_enable_tls": "Failed to enable TLS encryption",
+      "failed_read_template": "Failed to read template file",
+      "template_not_exists": "Template file does not exist",
+      "recipient_required": "Recipient address is required",
+      "sender_required": "Sender address is required",
+      "subject_required": "Email subject is required",
+      "body_required": "Email body is required",
+      "attachment_not_found": "Attachment file does not exist",
+      "image_not_found": "Image file does not exist",
+      "smtp_error": "SMTP error"
+    }
+  }
+}

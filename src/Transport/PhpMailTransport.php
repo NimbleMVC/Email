@@ -3,7 +3,9 @@
 namespace NimblePHP\Email\Transport;
 
 use NimblePHP\Email\Exception\EmailException;
+use NimblePHP\Framework\Kernel;
 use NimblePHP\Framework\Traits\LogTrait;
+use NimblePHP\Framework\Translation\Translation;
 
 class PhpMailTransport implements TransportInterface
 {
@@ -134,7 +136,10 @@ class PhpMailTransport implements TransportInterface
 
         if (!$success) {
             $this->log('Failed to send email using PHP mail()', 'ERR');
-            throw new EmailException("Failed to send email using PHP mail()");
+            /** @var Translation $translation */
+            $translation = Kernel::$serviceContainer->get('kernel.translation');
+
+            throw new EmailException($translation->translate('module.email.failed_send'));
         }
 
         $this->log('Email successfully sent using PHP mail()', 'INFO');
