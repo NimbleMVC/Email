@@ -1,0 +1,18 @@
+{
+  "module": {
+    "email": {
+      "failed_send": "Nie udało się wysłać wiadomości e-mail",
+      "failed_smtp_connect": "Nie można połączyć się z serwerem SMTP",
+      "failed_enable_tls": "Nie udało się włączyć szyfrowania TLS",
+      "failed_read_template": "Nie udało się odczytać pliku szablonu",
+      "template_not_exists": "Plik szablonu nie istnieje",
+      "recipient_required": "Adres odbiorcy jest wymagany",
+      "sender_required": "Adres nadawcy jest wymagany",
+      "subject_required": "Temat wiadomości jest wymagany",
+      "body_required": "Treść wiadomości jest wymagana",
+      "attachment_not_found": "Plik załącznika nie istnieje",
+      "image_not_found": "Plik obrazu nie istnieje",
+      "smtp_error": "Błąd SMTP"
+    }
+  }
+}

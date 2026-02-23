@@ -3,6 +3,9 @@
 namespace NimblePHP\Email\Template;
 
 use NimblePHP\Email\Exception\EmailException;
+use NimblePHP\Framework\Kernel;
+use NimblePHP\Framework\Log;
+use NimblePHP\Framework\Translation\Translation;
 
 class TemplateProcessor
 {
@@ -36,12 +39,23 @@ class TemplateProcessor
     public function processFile(string $templatePath, array $variables = []): string
     {
         if (!file_exists($templatePath)) {
-            throw new EmailException("Template file $templatePath does not exist");
+            Log::log('Template file does not exists', 'ERR', ['path' => $templatePath]);
+
+            /** @var Translation $translation */
+            $translation = Kernel::$serviceContainer->get('kernel.translation');
+
+            throw new EmailException($translation->translate('module.email.template_not_exists'));
         }
 
         $content = file_get_contents($templatePath);
+        
         if ($content === false) {
-            throw new EmailException("Failed to read template file $templatePath");
+            Log::log('Failed read template file', 'ERR', ['path' => $templatePath]);
+
+            /** @var Translation $translation */
+            $translation = Kernel::$serviceContainer->get('kernel.translation');
+
+            throw new EmailException($translation->translate('module.email.failed_read_template'));
         }
 
         return $this->processContent($content, $variables);

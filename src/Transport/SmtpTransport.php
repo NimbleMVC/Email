@@ -4,7 +4,10 @@ namespace NimblePHP\Email\Transport;
 
 use NimblePHP\Email\Config\EmailConfig;
 use NimblePHP\Email\Exception\EmailException;
+use NimblePHP\Framework\Kernel;
+use NimblePHP\Framework\Log;
 use NimblePHP\Framework\Traits\LogTrait;
+use NimblePHP\Framework\Translation\Translation;
 
 class SmtpTransport implements TransportInterface
 {
@@ -131,7 +134,12 @@ class SmtpTransport implements TransportInterface
         );
 
         if (!$this->socket) {
-            throw new EmailException("Could not connect to SMTP server: $errstr ($errno)");
+            Log::log('Could not connect to SMTP server', 'ERR', ['errstr' => $errstr, 'errno' => $errno]);
+
+            /** @var Translation $translation */
+            $translation = Kernel::$serviceContainer->get('kernel.translation');
+
+            throw new EmailException($translation->translate('module.email.failed_smtp_connect'));
         }
 
         stream_set_timeout($this->socket, $this->timeout);
@@ -147,7 +155,10 @@ class SmtpTransport implements TransportInterface
             $this->getResponse();
 
             if (!stream_socket_enable_crypto($this->socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT)) {
-                throw new EmailException("Failed to enable TLS encryption");
+                /** @var Translation $translation */
+                $translation = Kernel::$serviceContainer->get('kernel.translation');
+
+                throw new EmailException($translation->translate('module.email.failed_enable_tls'));
             }
 
             fputs($this->socket, "EHLO $hostname\r\n");
@@ -340,7 +351,11 @@ class SmtpTransport implements TransportInterface
 
         if ($code >= 400) {
             $this->log('SMTP error', 'ERR', ['response' => $response, 'code' => $code]);
-            throw new EmailException("SMTP Error: $response");
+
+            /** @var Translation $translation */
+            $translation = Kernel::$serviceContainer->get('kernel.translation');
+
+            throw new EmailException($translation->translate('module.email.smtp_error'));
         }
 
         $this->log('SMTP response', 'INFO', ['response' => $response, 'code' => $code]);

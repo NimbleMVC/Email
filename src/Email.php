@@ -8,10 +8,13 @@ use NimblePHP\Email\Transport\PhpMailTransport;
 use NimblePHP\Email\Transport\SmtpTransport;
 use NimblePHP\Email\Transport\TransportInterface;
 use NimblePHP\Email\Exception\EmailException;
+use NimblePHP\Framework\Kernel;
 use NimblePHP\Framework\Traits\LogTrait;
+use NimblePHP\Framework\Translation\Translation;
 
 class Email
 {
+
     use LogTrait;
 
     /** @var string|null */
@@ -274,7 +277,10 @@ class Email
     public function attachment(string $path, string $name = ''): self
     {
         if (!file_exists($path)) {
-            throw new EmailException("File $path does not exist");
+            /** @var Translation $translation */
+            $translation = Kernel::$serviceContainer->get('kernel.translation');
+
+            throw new EmailException($translation->translate('module.email.attachment_not_found'));
         }
 
         $this->attachments[] = [
@@ -313,7 +319,10 @@ class Email
     public function embedImage(string $path, string $cid): self
     {
         if (!file_exists($path)) {
-            throw new EmailException("Image file $path does not exist");
+            /** @var Translation $translation */
+            $translation = Kernel::$serviceContainer->get('kernel.translation');
+
+            throw new EmailException($translation->translate('module.email.image_not_found'));
         }
 
         $mime = mime_content_type($path) ?: 'image/jpeg';
@@ -448,26 +457,33 @@ class Email
      */
     public function send(): bool
     {
+        /** @var Translation $translation */
+        $translation = Kernel::$serviceContainer->get('kernel.translation');
+
         $this->log('Sending email', 'INFO');
 
         if (empty($this->to)) {
             $this->log('Email recipient is missing', 'ERR');
-            throw new EmailException('Recipient address is required');
+
+            throw new EmailException($translation->translate('module.email.recipient_required'));
         }
 
         if (empty($this->from)) {
             $this->log('Email sender is missing', 'ERR');
-            throw new EmailException('Sender address is required');
+
+            throw new EmailException($translation->translate('module.email.sender_required'));
         }
 
         if (empty($this->subject)) {
             $this->log('Email subject is missing', 'ERR');
-            throw new EmailException('Email subject is required');
+
+            throw new EmailException($translation->translate('module.email.subject_required'));
         }
 
         if (empty($this->body)) {
             $this->log('Email body is missing', 'ERR');
-            throw new EmailException('Email body is required');
+
+            throw new EmailException($translation->translate('module.email.body_required'));
         }
 
         $headers = [];
