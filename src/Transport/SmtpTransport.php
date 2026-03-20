@@ -137,7 +137,7 @@ class SmtpTransport implements TransportInterface
             Log::log('Could not connect to SMTP server', 'ERR', ['errstr' => $errstr, 'errno' => $errno]);
 
             /** @var Translation $translation */
-            $translation = Kernel::$serviceContainer->get('kernel.translation');
+            $translation = Kernel::$serviceContainer->get('translation');
 
             throw new EmailException($translation->translate('module.email.failed_smtp_connect'));
         }
@@ -156,7 +156,7 @@ class SmtpTransport implements TransportInterface
 
             if (!stream_socket_enable_crypto($this->socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT)) {
                 /** @var Translation $translation */
-                $translation = Kernel::$serviceContainer->get('kernel.translation');
+                $translation = Kernel::$serviceContainer->get('translation');
 
                 throw new EmailException($translation->translate('module.email.failed_enable_tls'));
             }
@@ -353,7 +353,7 @@ class SmtpTransport implements TransportInterface
             $this->log('SMTP error', 'ERR', ['response' => $response, 'code' => $code]);
 
             /** @var Translation $translation */
-            $translation = Kernel::$serviceContainer->get('kernel.translation');
+            $translation = Kernel::$serviceContainer->get('translation');
 
             throw new EmailException($translation->translate('module.email.smtp_error'));
         }

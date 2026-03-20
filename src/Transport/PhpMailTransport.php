@@ -137,7 +137,7 @@ class PhpMailTransport implements TransportInterface
         if (!$success) {
             $this->log('Failed to send email using PHP mail()', 'ERR');
             /** @var Translation $translation */
-            $translation = Kernel::$serviceContainer->get('kernel.translation');
+            $translation = Kernel::$serviceContainer->get('translation');
 
             throw new EmailException($translation->translate('module.email.failed_send'));
         }

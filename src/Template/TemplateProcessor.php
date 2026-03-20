@@ -42,7 +42,7 @@ class TemplateProcessor
             Log::log('Template file does not exists', 'ERR', ['path' => $templatePath]);
 
             /** @var Translation $translation */
-            $translation = Kernel::$serviceContainer->get('kernel.translation');
+            $translation = Kernel::$serviceContainer->get('translation');
 
             throw new EmailException($translation->translate('module.email.template_not_exists'));
         }
@@ -53,7 +53,7 @@ class TemplateProcessor
             Log::log('Failed read template file', 'ERR', ['path' => $templatePath]);
 
             /** @var Translation $translation */
-            $translation = Kernel::$serviceContainer->get('kernel.translation');
+            $translation = Kernel::$serviceContainer->get('translation');
 
             throw new EmailException($translation->translate('module.email.failed_read_template'));
         }
