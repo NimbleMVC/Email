@@ -278,7 +278,7 @@ class Email
     {
         if (!file_exists($path)) {
             /** @var Translation $translation */
-            $translation = Kernel::$serviceContainer->get('kernel.translation');
+            $translation = Kernel::$serviceContainer->get('translation');
 
             throw new EmailException($translation->translate('module.email.attachment_not_found'));
         }
@@ -320,7 +320,7 @@ class Email
     {
         if (!file_exists($path)) {
             /** @var Translation $translation */
-            $translation = Kernel::$serviceContainer->get('kernel.translation');
+            $translation = Kernel::$serviceContainer->get('translation');
 
             throw new EmailException($translation->translate('module.email.image_not_found'));
         }
@@ -458,7 +458,7 @@ class Email
     public function send(): bool
     {
         /** @var Translation $translation */
-        $translation = Kernel::$serviceContainer->get('kernel.translation');
+        $translation = Kernel::$serviceContainer->get('translation');
 
         $this->log('Sending email', 'INFO');
 
