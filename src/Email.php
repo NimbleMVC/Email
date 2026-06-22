@@ -47,6 +47,9 @@ class Email
     /** @var bool */
     private bool $isHtml = false;
 
+    /** @var string|null */
+    private ?string $altBody = null;
+
     /** @var EmailConfig */
     private EmailConfig $config;
 
@@ -133,6 +136,18 @@ class Email
     {
         $this->body = $body;
         $this->isHtml = $isHtml;
+
+        return $this;
+    }
+
+    /**
+     * Sets plain-text alternative body for HTML emails (multipart/alternative)
+     * @param string $altBody Plain text version of the email
+     * @return $this
+     */
+    public function altBody(string $altBody): self
+    {
+        $this->altBody = $altBody;
 
         return $this;
     }
@@ -508,7 +523,8 @@ class Email
             $this->embeddedImages,
             $this->isHtml,
             $this->cc,
-            $this->bcc
+            $this->bcc,
+            $this->altBody
         );
     }
 }

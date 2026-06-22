@@ -31,7 +31,8 @@ interface TransportInterface
         array $embeddedImages = [],
         bool $isHtml = false,
         array $cc = [],
-        array $bcc = []
+        array $bcc = [],
+        ?string $altBody = null
     ): bool;
 
     /**

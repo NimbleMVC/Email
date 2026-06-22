@@ -67,7 +67,8 @@ class PhpMailTransport implements TransportInterface
         array $embeddedImages = [],
         bool $isHtml = false,
         array $cc = [],
-        array $bcc = []
+        array $bcc = [],
+        ?string $altBody = null
     ): bool {
         $this->log('Sending email via PHP mail()', 'INFO');
 
@@ -89,19 +90,35 @@ class PhpMailTransport implements TransportInterface
         $mailHeaders[] = "MIME-Version: 1.0";
 
         $hasAttachments = !empty($attachments) || !empty($embeddedImages);
-        if ($hasAttachments) {
-            $boundary = md5(time());
-            $mailHeaders[] = "Content-Type: multipart/mixed; boundary=\"$boundary\"";
+        $hasAltBody = $isHtml && $altBody !== null;
 
-            $message = "--$boundary\r\n";
-            $message .= "Content-Type: " . ($isHtml ? "text/html" : "text/plain") . "; charset=UTF-8\r\n";
-            $message .= "Content-Transfer-Encoding: 8bit\r\n\r\n";
-            $message .= $body . "\r\n\r\n";
+        if ($hasAttachments) {
+            $mixedBoundary = md5(time() . 'mixed');
+            $mailHeaders[] = "Content-Type: multipart/mixed; boundary=\"$mixedBoundary\"";
+
+            $message = "--$mixedBoundary\r\n";
+            if ($hasAltBody) {
+                $altBoundary = md5(time() . 'alt');
+                $message .= "Content-Type: multipart/alternative; boundary=\"$altBoundary\"\r\n\r\n";
+                $message .= "--$altBoundary\r\n";
+                $message .= "Content-Type: text/plain; charset=UTF-8\r\n";
+                $message .= "Content-Transfer-Encoding: 8bit\r\n\r\n";
+                $message .= $altBody . "\r\n\r\n";
+                $message .= "--$altBoundary\r\n";
+                $message .= "Content-Type: text/html; charset=UTF-8\r\n";
+                $message .= "Content-Transfer-Encoding: 8bit\r\n\r\n";
+                $message .= $body . "\r\n\r\n";
+                $message .= "--$altBoundary--\r\n\r\n";
+            } else {
+                $message .= "Content-Type: " . ($isHtml ? "text/html" : "text/plain") . "; charset=UTF-8\r\n";
+                $message .= "Content-Transfer-Encoding: 8bit\r\n\r\n";
+                $message .= $body . "\r\n\r\n";
+            }
 
             foreach ($embeddedImages as $image) {
                 $content = file_get_contents($image['path']);
                 $content = chunk_split(base64_encode($content));
-                $message .= "--$boundary\r\n";
+                $message .= "--$mixedBoundary\r\n";
                 $message .= "Content-Type: {$image['mime']}; name=\"" . basename($image['path']) . "\"\r\n";
                 $message .= "Content-Transfer-Encoding: base64\r\n";
                 $message .= "Content-ID: <{$image['cid']}>\r\n";
@@ -117,14 +134,27 @@ class PhpMailTransport implements TransportInterface
                 }
 
                 $content = chunk_split(base64_encode($content));
-                $message .= "--$boundary\r\n";
+                $message .= "--$mixedBoundary\r\n";
                 $message .= "Content-Type: " . ($attachment['mime'] ?? "application/octet-stream") . "; name=\"{$attachment['name']}\"\r\n";
                 $message .= "Content-Transfer-Encoding: base64\r\n";
                 $message .= "Content-Disposition: attachment; filename=\"{$attachment['name']}\"\r\n\r\n";
                 $message .= $content . "\r\n\r\n";
             }
 
-            $message .= "--$boundary--";
+            $message .= "--$mixedBoundary--";
+        } elseif ($hasAltBody) {
+            $altBoundary = md5(time() . 'alt');
+            $mailHeaders[] = "Content-Type: multipart/alternative; boundary=\"$altBoundary\"";
+
+            $message = "--$altBoundary\r\n";
+            $message .= "Content-Type: text/plain; charset=UTF-8\r\n";
+            $message .= "Content-Transfer-Encoding: 8bit\r\n\r\n";
+            $message .= $altBody . "\r\n\r\n";
+            $message .= "--$altBoundary\r\n";
+            $message .= "Content-Type: text/html; charset=UTF-8\r\n";
+            $message .= "Content-Transfer-Encoding: 8bit\r\n\r\n";
+            $message .= $body . "\r\n\r\n";
+            $message .= "--$altBoundary--";
         } else {
             $mailHeaders[] = "Content-Type: " . ($isHtml ? "text/html" : "text/plain") . "; charset=UTF-8";
             $message = $body;
